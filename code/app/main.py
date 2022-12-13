@@ -1,7 +1,7 @@
 from utils import *
 
 from fastapi import FastAPI, Query, Path, Body
-from pydantic import BaseModel, Required
+from pydantic import BaseModel, Required, Field, HttpUrl
 
 
 app = FastAPI()
@@ -165,3 +165,52 @@ def create_cities(
     city_item.update({'country': country_name})
 
     return city_item
+
+
+"""
+Exemplo usando Body Field
+"""
+
+
+class PersonalComputer(BaseModel):
+    name: str = Field(
+        regex='^pc', default=None, description='Nome do pc', max_length=10
+    )
+    serie: int = Field(gt=1, description='Passe uma série válida')
+
+
+@app.put('/pcs/{pc_id}')
+async def update_pc(
+    *,
+    pc_id: int = Path(..., description='Passe um válido.'),
+    pc: PersonalComputer = Body(..., embed=True, description='Uma maquina')
+):
+    if pc_id // 2 == 0:
+        return {'message': 'Inválido'}
+    return pc
+
+
+"""
+Exemplo com subtipos como BaseModel
+"""
+
+
+class Image(BaseModel):
+    url: HttpUrl
+    size: int
+
+
+class Product(BaseModel):
+    name: str
+    price: int
+    images: list[Union[Image, None]] = None
+
+
+class Store(BaseModel):
+    products: Union[list[Product], None]
+    name: str = Body(..., description='Nome da loja')
+
+
+@app.post('/products/')
+def create_products(store: Store = Body(..., embed=True)):
+    return store
