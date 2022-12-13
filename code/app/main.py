@@ -1,6 +1,6 @@
 from utils import *
 
-from fastapi import FastAPI, Query, Path, Body
+from fastapi import FastAPI, Query, Path, Body, Cookie, Header
 from pydantic import BaseModel, Required, Field, HttpUrl
 
 
@@ -201,16 +201,49 @@ class Image(BaseModel):
 
 
 class Product(BaseModel):
-    name: str
-    price: int
+    name: str = Field(..., example='Produto base')
+    price: float
     images: list[Union[Image, None]] = None
 
 
 class Store(BaseModel):
     products: Union[list[Product], None]
-    name: str = Body(..., description='Nome da loja')
+    name: str = Field(..., description='Nome da loja')
+
+    class Config:
+        schema_extra = {
+            'example': {
+                'products': [
+                    {
+                        'name': 'Computador',
+                        'price': 12.4,
+                        'images': [{'url': 'http://test.com', 'size': 1}],
+                    }
+                ],
+                'name': 'Loja dos fundos',
+            }
+        }
 
 
 @app.post('/products/')
 def create_products(store: Store = Body(..., embed=True)):
     return store
+
+
+@app.get('/products/{product_id}')
+def retrive_products(*, product_id: UUID = Path(..., description='Produto existente')):
+    return {}
+
+
+"""
+Exemplo com Cookie e Header
+"""
+
+
+@app.get('/params/')
+def request_params(
+    user_agent: str = Header(default=None),
+    ads_id: Union[str, None] = Cookie(default=None),
+):
+    return {'cookie': ads_id, 'user_agent': user_agent}
+
