@@ -7,17 +7,19 @@ O Presente projeto consiste num estudo , passo a passo, do web framework Fast AP
 
 Url base (base_url): http://localhost:8082
 
--> Para executar 
-    make stop
-    make build
-    make start
+-> Para executar
 
-- acesso: base_url
+    make stop;
+    
+    make build ;
+    
+    make start; 
 
--> Visualizar documentação - gerada automaticamente
+-> Documentação
 
-    ->  base_url/docs (swagger)
-    ->  base_url/redoc (redoc)
+http://localhost:8082/docs (swagger)
+
+http://localhost:8082/redoc (redoc)
 
 ## Regras de negócio
 
